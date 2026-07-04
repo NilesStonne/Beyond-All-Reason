@@ -213,6 +213,7 @@ local callInLists = {
 	'CommandsChanged',
 	'LanguageChanged',
 	'UnitBlocked',
+	'SharePolicyChanged',
 	'VisibleUnitAdded',
 	'VisibleUnitRemoved',
 	'VisibleUnitsChanged',
@@ -2402,6 +2403,14 @@ function widgetHandler:UnitBlocked(unitDefID, reasons)
 	tracy.ZoneBeginN("W:UnitBlocked")
 	for _, w in ipairs(self.UnitBlockedList) do
 		w:UnitBlocked(unitDefID, reasons)
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:SharePolicyChanged(teamID, domain)
+	tracy.ZoneBeginN("W:SharePolicyChanged")
+	for _, w in ipairs(self.SharePolicyChangedList) do
+		w:SharePolicyChanged(teamID, domain)
 	end
 	tracy.ZoneEnd()
 end
