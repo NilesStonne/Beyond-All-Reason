@@ -491,8 +491,10 @@ end
 -- Use with a weapon with a high firing arc, or it can cause strange behaviors, e.g. when firing down.
 
 weaponCustomParamKeys.split = {
-	speceffect_def    = toWeaponDefID, -- name of spawned weapondef (weapon type must be non-hitscan)
-	number            = tonumber, -- count of projectiles to spawn
+	speceffect_def            = toWeaponDefID, -- name of spawned weapondef (weapon type must be non-hitscan)
+	speceffect_def_targetable = toWeaponDefID, -- optional targetable submunition weapondef
+	number_targetable         = tonumber, -- count of targetable submunitions to spawn
+	number                    = tonumber, -- count of projectiles to spawn
 	splitexplosionceg = tostring, -- name of spawned CEG (use a small puff, there is no damage)
 	cegtag            = tostring, -- as `projectileParams.cegTag`
 	model             = tostring, -- as `projectileParams.model`
@@ -521,12 +523,16 @@ local function split(params, projectileID)
 	local fanDiv = params.fanning_divisor or (params.scatter and 200 or 880)
 	local fanDivY = params.fanning_divisor_y or (params.scatter and 150 or 440)
 
-	for _ = 1, params.number do
+	local targetableWeaponDefID = params.speceffect_def_targetable
+	local numTargetable = params.number_targetable or 0
+
+	for i = 1, params.number do
 		speed[1] = velocityX * vMult + parentSpeed * (math_random(-100, 100) / fanDiv)
 		speed[2] = velocityY * vMult + parentSpeed * (math_random(-100, 100) / fanDivY)
 		speed[3] = velocityZ * vMult + parentSpeed * (math_random(-100, 100) / fanDiv)
 
-		local spawnedID = spSpawnProjectile(weaponDefID, projectileParams)
+		local currentWeaponDefID = (i <= numTargetable and targetableWeaponDefID) and targetableWeaponDefID or weaponDefID
+		local spawnedID = spSpawnProjectile(currentWeaponDefID, projectileParams)
 		if spawnedID and targetType and params.scatter then
 			if targetType == targetedGround then
 				-- Assign a randomized landing target coordinate within the scatter radius
